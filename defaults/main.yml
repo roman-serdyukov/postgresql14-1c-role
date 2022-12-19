@@ -1,0 +1,22 @@
+---
+# defaults file for postgresql14
+
+folder_distr: /home/{{ ansible_user }}
+
+path_distr: "{{ folder_distr }}/distr"
+
+psql_password: password
+
+psql_ver: 14.5-3.1C
+
+psql_packages:
+  - "{{ path_distr }}/libpq5_{{ psql_ver }}_amd64.deb"
+  - "{{ path_distr }}/postgresql-client-14_{{ psql_ver }}_amd64.deb"
+  - "{{ path_distr }}/postgresql-14_{{ psql_ver }}_amd64.deb"
+
+other_packages:
+  - libldap-2.4-2
+  - libssl1.1
+  - libicu60
+  - libllvm6.0
+  - postgresql-common

@@ -1,0 +1,33 @@
+---
+# Install other packages for postgresql 14
+
+- name: Install other packages | Add apt-key
+  become: true
+  ansible.builtin.command: apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
+
+- name: Install other packages | Add repository into sources list
+  become: true
+  ansible.builtin.apt_repository:
+    repo: deb http://ru.archive.ubuntu.com/ubuntu/ bionic main universe
+    state: present
+
+- name: Install other packages | Create the file repository configuration & Import the repository signing key
+  become: true
+  ansible.builtin.shell: "{{ item }}"
+  with_items:
+  - sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+  - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+  when: ansible_distribution_version == '20.04'
+
+- name: Install other packages | Update apt cache
+  become: true
+  ansible.builtin.apt: 
+    update_cache: yes 
+  # ignore_errors: true
+
+- name: Install other packages | Install packages
+  become: true
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ other_packages }}"

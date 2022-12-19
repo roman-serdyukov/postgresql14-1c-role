@@ -1,0 +1,46 @@
+---
+# Install postgresql server
+
+- name: Install postgresql | Create folder distr in home  
+  ansible.builtin.file:
+    path: "{{ folder_distr }}/distr"
+    state: directory
+    mode: 0777  
+
+- name: Install postgresql | Copy postgresql files
+  ansible.builtin.copy:
+    src: distr/. 
+    dest: "{{ folder_distr }}/distr" 
+    mode: 0777
+
+- name: Install postgresql | Install postgresql files
+  become: true
+  ansible.builtin.apt:
+    deb: '{{ item }}'
+  with_items:
+  - "{{ psql_packages }}"
+
+- name: Install postgresql | Hold update postgresql
+  become: true
+  ansible.builtin.command: apt-mark hold postgresql*
+    
+- name: Install postgresql | Restart postgresql
+  become: true
+  service: 
+    name: postgresql
+    state: restarted
+
+- name: Install postgresql | Set password for postgres user & cluster db
+  become: true
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+  - echo 'postgres:{{ psql_password }}' | chpasswd
+  - sudo -u postgres /usr/bin/psql -U postgres -c "alter user postgres with password '{{ psql_password }}';"
+
+- name: Install postgresql | Check postgresql clusters
+  ansible.builtin.command: pg_lsclusters 
+  register: results
+
+- name: Install postgresql | View postgresql clusters
+  debug:
+    var: results

@@ -1,0 +1,12 @@
+---
+# tasks file for postgresql14-role
+
+- name: Install RU locale
+  include_tasks: install_locale_ru.yml
+  when: ansible_nodename == "u-serv-test-2204"
+
+- name: Install other packages
+  include_tasks: install_other_pack.yml
+
+- name: Install postgresql
+  include_tasks: install_postgresql.yml

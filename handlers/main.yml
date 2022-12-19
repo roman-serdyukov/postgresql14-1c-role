@@ -1,0 +1,6 @@
+---
+# handlers file for postgresql14
+
+- name: Reboot server
+  become: true
+  reboot:
